@@ -30,5 +30,13 @@ def display_crime_data():
     url_crime = f"https://data.cityofchicago.org/resource/ijzp-q8t2.json?$where=date between '2021-01-01T12:00:00' and '2021-12-31T23:59:59' AND within_circle(location, {lat}, {long}, 1000)&arrest=true&$$app_token={APP_TOKEN}"
     response_crime = requests.get(url_crime).json()
     print(len(response_crime))
-    return jsonify(response_crime)
+
+    coordinates_list = []
+    for report in response_crime:
+        lat_long_dict = {}
+        lat_long_dict["latitude"] = report["latitude"]
+        lat_long_dict["longitude"] = report["longitude"]
+        coordinates_list.append(lat_long_dict)
+
+    return jsonify(coordinates_list)
 

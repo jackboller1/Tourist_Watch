@@ -1,10 +1,10 @@
 /* OSM & OL example code provided by https://mediarealm.com.au/ */
 var map;
-var mapLat = -33.829357;
-var mapLng = 150.961761;
+var mapLat = 42.2328;
+var mapLng = -88.0457;
 var mapDefaultZoom = 10;
 
-function initialize_map() {
+export function initialize_map() {
   map = new ol.Map({
     target: "map",
     layers: [
@@ -21,7 +21,7 @@ function initialize_map() {
   });
 }
 
-function add_map_point(lat, lng) {
+export function add_map_point(lat, lng) {
   var vectorLayer = new ol.layer.Vector({
     source:new ol.source.Vector({
       features: [new ol.Feature({
@@ -37,7 +37,5 @@ function add_map_point(lat, lng) {
       })
     })
   });
-
   map.addLayer(vectorLayer); 
 }
-

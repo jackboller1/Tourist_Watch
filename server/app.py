@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import os
 import requests
 
 APP_TOKEN = os.environ.get("SOCRATA_APP_TOKEN")
-POSITION_STACK_KEY = os.environ.get("POSITION_STACK_KEY")
+POSITION_STACK_KEY = os.environ.get("POSITION_STACK_APIKEY")
 
 app = Flask(__name__)
+CORS(app)
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def home():
     return "Hello World! I'm using Flask."
 

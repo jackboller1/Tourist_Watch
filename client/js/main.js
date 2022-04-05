@@ -7,9 +7,12 @@ document.getElementById("search_btn").onclick = () => {
     processPlaceQuery(query);
 }
 
-const processPlaceQuery = (place) => {
+const processPlaceQuery = async (place) => {
     let req = {
-        place : place
+        "address" : place
     };
-    
+    let pts = await api.getData(req);
+    for(let i = 0; i < pts.length; i++){
+        map.add_map_point(parseFloat(pts[i].latitude), parseFloat(pts[i].longitude));
+    }
 }

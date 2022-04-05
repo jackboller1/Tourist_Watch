@@ -1,14 +1,12 @@
-const HOSTNAME = "http://127.0.0.1";
+const HOSTNAME = "http://127.0.0.1:5000";
 
-export const getData = (place) => {
-    let response = await fetch(`{HOSTNAME}/api/getData`, {
+export const getData = async (place) => {
+    let response = await fetch(`${HOSTNAME}/city`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json;charset=utf-8'
+            'Content-Type': 'application/json;charset=utf-8',
         },
         body: JSON.stringify(place)
     });
-    let res = await response.json();
-    let points = {}
-    
+    return await response.json();
 }

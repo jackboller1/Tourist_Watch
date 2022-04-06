@@ -6,7 +6,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
 	<script src="https://openlayers.org/en/v4.6.5/build/ol.js" type="text/javascript"></script>
-  	<script type="module" src="../js/main.js"></script>
+  	<script type="module" src="{{ url_for('static', filename = '../static/main.js') }}"></script>
 </head>
 <input type="text" placeholder="Enter place name" id="search_entry">
 <button id="search_btn">Go</button>

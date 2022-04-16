@@ -1,11 +1,16 @@
 import os
 import requests
 from flask import Blueprint, request, jsonify
-from crime_grouping import crime_group, crime_type_fields
+from crime_grouping import crime_standardization, crime_type_fields, assoc_list1, assoc_list2
 from city_info import url_group, date_field_group
 
 APP_TOKEN = os.environ.get("SOCRATA_APP_TOKEN")
 POSITION_STACK_KEY = os.environ.get("POSITION_STACK_APIKEY")
+
+#create standardization for crime among different cities
+crime_group = {}
+crime_standardization(crime_group, "Chicago", assoc_list1)
+crime_standardization(crime_group, "Austin", assoc_list2)
 
 api = Blueprint('api', __name__)
 

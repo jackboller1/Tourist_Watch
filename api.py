@@ -33,7 +33,7 @@ def display_crime_data():
     city_url = url_group[city]
     date_field = date_field_group[city]
     location_field = location_field_group[city]
-    url_crime = f"{city_url}$where={date_field} between '2021-01-01T12:00:00' and '2021-12-31T23:59:59' AND within_circle({location_field}, {lat}, {long}, 5000)&$$app_token={APP_TOKEN}"
+    url_crime = f"{city_url}$where={date_field} between '2021-01-01T12:00:00' and '2021-12-31T23:59:59' AND within_circle({location_field}, {lat}, {long}, 2500)&$$app_token={APP_TOKEN}"
     response_crime = requests.get(url_crime).json()
 
     #create list of crimes that fall into specific categories

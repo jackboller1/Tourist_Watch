@@ -21,7 +21,8 @@ assoc_list3 = [ (["SEXUAL ABUSE 3,2", "SEXUAL ABUSE", "SODOMY 1", "RAPE 1", "RAP
 
 crime_type_fields = {"Chicago" : "fbi_code",
                     "Austin" : "ucr_category",
-                    "New York" : "pd_desc"
+                    "New York" : "pd_desc",
+                    "Kansas City" : "ibrs"
                     }
 
 

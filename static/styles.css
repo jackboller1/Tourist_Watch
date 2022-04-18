@@ -44,3 +44,13 @@
     color:gray;
     font-size: 40px;
 }
+
+.map {
+    float: left;
+    width: 75%;
+}
+
+.side-menu {
+    float: left;
+    width: 25%;
+}

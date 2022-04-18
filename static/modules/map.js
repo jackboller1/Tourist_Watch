@@ -3,6 +3,7 @@ var map;
 var mapLat = 42.2328;
 var mapLng = -88.0457;
 var mapDefaultZoom = 10;
+var layers = []
 
 export function initialize_map() {
   map = new ol.Map({
@@ -23,6 +24,10 @@ export function initialize_map() {
 
 export function reset_center(lat, lng){
   //console.log("resetting center... " + lat + " " + lng);
+  for(let i = 0; i < layers.length; i++){
+    map.removeLayer(layers[i]);
+  }
+  layers.length = 0;
   map.getView().animate({
     center: ol.proj.fromLonLat([lng, lat]),
     duration: 1000
@@ -46,4 +51,5 @@ export function add_map_point(lat, lng) {
     })
   });
   map.addLayer(vectorLayer); 
+  layers.push(vectorLayer);
 }

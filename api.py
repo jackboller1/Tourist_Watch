@@ -1,9 +1,18 @@
 import os
 import requests
 from flask import Blueprint, request, jsonify
+from crime_grouping import crime_standardization, crime_type_fields, assoc_list1, assoc_list2, assoc_list3
+from city_info import url_group, date_field_group, location_field_group
 
 APP_TOKEN = os.environ.get("SOCRATA_APP_TOKEN")
 POSITION_STACK_KEY = os.environ.get("POSITION_STACK_APIKEY")
+
+#create standardization for crime among different cities
+crime_group = {}
+crime_standardization(crime_group, "Chicago", assoc_list1)
+crime_standardization(crime_group, "Austin", assoc_list2)
+crime_standardization(crime_group, "New York", assoc_list3)
+crime_standardization(crime_group, "Kansas City", assoc_list2)
 
 api = Blueprint('api', __name__)
 
@@ -18,20 +27,28 @@ def display_crime_data():
     response_geocode = requests.get(url_geocode).json()
     lat = response_geocode["data"][0]["latitude"]
     long = response_geocode["data"][0]["longitude"]
-    
-    # lat = request_data.get("latitude")
-    # long = request_data.get("longitude")
+    city = response_geocode["data"][0]["locality"]
 
-    #url = f"https://data.cityofchicago.org/resource/dfnk-7re6.json?$where=within_circle(location, {lat}, {long}, 1000)&$$app_token={APP_TOKEN}"
-    url_crime = f"https://data.cityofchicago.org/resource/ijzp-q8t2.json?$where=date between '2021-01-01T12:00:00' and '2021-12-31T23:59:59' AND within_circle(location, {lat}, {long}, 1000)&arrest=true&$$app_token={APP_TOKEN}"
+    #get the filtered set of crimes from socrata api
+    city_url = url_group[city]
+    date_field = date_field_group[city]
+    location_field = location_field_group[city]
+    url_crime = f"{city_url}$where={date_field} between '2021-01-01T12:00:00' and '2021-12-31T23:59:59' AND within_circle({location_field}, {lat}, {long}, 2500)&$$app_token={APP_TOKEN}"
     response_crime = requests.get(url_crime).json()
-    print(len(response_crime))
 
-    coordinates_list = []
+    #create list of crimes that fall into specific categories
+    incidents_list = []
     for report in response_crime:
-        lat_long_dict = {}
-        lat_long_dict["latitude"] = report["latitude"]
-        lat_long_dict["longitude"] = report["longitude"]
-        coordinates_list.append(lat_long_dict)
+        #print(report)
+        #only send crimes that fall in one of the 7 categories being tracked
+        #print(crime_type_fields[city])
+        if crime_type_fields[city] in report: #the response from socrata api has the correct field
+            crime_type = report[crime_type_fields[city]] #crime type sent from socrata api
+            if crime_type in crime_group[city]: #the crime type is one of the few that we want to track
+                incident_dict = {}
+                incident_dict["latitude"] = report["latitude"]
+                incident_dict["longitude"] = report["longitude"]
+                incident_dict["crime_type"] = crime_group[city][crime_type]
+                incidents_list.append(incident_dict)
 
-    return jsonify(coordinates_list)
+    return jsonify(incidents_list)

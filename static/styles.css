@@ -47,10 +47,10 @@
 
 .map {
     float: left;
-    width: 75%;
+    width: 100%;
 }
 
 .side-menu {
     float: left;
-    width: 25%;
+    /*width: 25%;*/
 }

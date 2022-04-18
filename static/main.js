@@ -21,10 +21,16 @@ const processPlaceQuery = async (place) => {
         });
     }
     let ctr = util.getCenter(pts_float);
+    let dev = util.getDev(pts_float, ctr["avg-lat"], ctr["avg-long"]);
     //console.log(ctr)
-    map.reset_center(ctr["avg-lat"], ctr["avg-long"]);
+    map.reset_center(ctr["avg-lat"], ctr["avg-long"], dev);
     
     for(let i = 0; i < pts.length; i++){
-        map.add_map_point(pts_float[i]["lat"], pts_float[i]["long"]);
+        //console.log(pts[i]);
+        let type = 1;
+        if(pts[i].crime_type.includes("assault")){
+            type = 0;
+        }
+        map.add_map_point(pts_float[i]["lat"], pts_float[i]["long"], type);
     }
 }

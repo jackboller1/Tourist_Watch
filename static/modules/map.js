@@ -21,6 +21,14 @@ export function initialize_map() {
   });
 }
 
+export function reset_center(lat, lng){
+  //console.log("resetting center... " + lat + " " + lng);
+  map.getView().animate({
+    center: ol.proj.fromLonLat([lng, lat]),
+    duration: 1000
+ })
+}
+
 export function add_map_point(lat, lng) {
   var vectorLayer = new ol.layer.Vector({
     source:new ol.source.Vector({

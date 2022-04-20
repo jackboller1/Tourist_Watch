@@ -1,4 +1,5 @@
 /* OSM & OL example code provided by https://mediarealm.com.au/ */
+
 var map;
 var mapLat = 42.2328;
 var mapLng = -88.0457;
@@ -6,6 +7,10 @@ var mapDefaultZoom = 10;
 var layers = []
 
 const ZOOM_SCALE = 700;
+
+const popup = new ol.Overlay({
+  element: document.getElementById('popup'),
+});
 
 const MARKER_TYPES = [
   {
@@ -33,6 +38,25 @@ export function initialize_map() {
         zoom: mapDefaultZoom
     })
   });
+  map.addOverlay(popup);
+
+  map.on("click", (evt) => {
+    const element = popup.getElement();
+    const coordinate = evt.coordinate;
+    const hdms = ol.coordinate.toStringHDMS(ol.proj.toLonLat(coordinate));
+  
+    $(element).popover('dispose');
+    popup.setPosition(coordinate);
+    $(element).popover({
+      container: element,
+      placement: 'top',
+      animation: false,
+      html: true,
+      content: '<p>The location you clicked was:</p><code>' + hdms + '</code>',
+    });
+    $(element).popover('show');
+  });
+  
 }
 
 export function reset_center(lat, lng, zoom_factor){

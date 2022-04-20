@@ -45,12 +45,15 @@
     font-size: 40px;
 }
 
+.main-container {
+    display: flex;
+}
+
 .map {
     float: left;
     width: 100%;
 }
 
-.side-menu {
-    float: left;
-    /*width: 25%;*/
+.popover-body {
+    min-width: 276px;
 }

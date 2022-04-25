@@ -25,4 +25,12 @@ app.register_blueprint(api)
 def home():
     return render_template("index.html")
 
+@app.route("/register", methods=['GET'])
+def register():
+    return render_template("register.html")
+
+@app.route("/submit-testimonial", methods=['GET'])
+def testimonial():
+    return render_template("testimonial.html")
+
 

@@ -1,4 +1,4 @@
-const HOSTNAME = "http://127.0.0.1:5000";
+const HOSTNAME = "https://polar-coast-49800.herokuapp.com";
 
 export const getData = async (place) => {
     let response = await fetch(`${HOSTNAME}/city`, {

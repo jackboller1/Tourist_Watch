@@ -16,7 +16,7 @@ def get_database():
 
 
 db = get_database()
-testimonials = db.testimonials
+testimonials_db = db.testimonials
 
 
 

@@ -52,7 +52,7 @@ export function initialize_map() {
       placement: 'top',
       animation: false,
       html: true,
-      content: '<p>The location you clicked was:</p><code>' + hdms + '</code>',
+      content: '<div>Hello</div>',
     });
     $(element).popover('show');
   });

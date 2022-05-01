@@ -31,27 +31,22 @@
 			</div>
 		</div>
 		<br>
-		<label>Category 1</label>
-		<select>
-			<option value="Test1">Test1</option>
-			<option value="Test2">Test2</option>
-			<option value="Test3">Test3</option>
-		</select>
-		<label>Category 2</label>
-		<select>
-			<option value="Test1">Test1</option>
-			<option value="Test1">Test1</option>
-			<option value="Test1">Test1</option>
-		</select>
-		<label>Category 3</label>
-		<select>
-			<option value="Test1">Test1</option>
-			<option value="Test1">Test1</option>
-			<option value="Test1">Test1</option>
-		</select>
-		<div id="filter-btns" style="float:right">
-			<button id="set-filters">Set filters</button>
-			<button id="reset-filters">Reset filters</button>
+		<div id="filter_options" style="visibility:visible">
+			<label>View Data:</label>
+			<select onchange="filter(0, this);">
+				<option value="crime">Crime</option>
+				<option value="testimonials">Testimonials</option>
+			</select>
+			<label>Time of Day: </label>
+			<select onchange="filter(1, this)">
+				<option value="morning">Morning</option>
+				<option value="afternoon">Afternoon</option>
+				<option value="night">Night</option>
+			</select>
+			<div id="filter-btns" style="float:right">
+				<button id="set-filters">Set filters</button>
+				<button id="reset-filters">Reset filters</button>
+			</div>
 		</div>
 	</div>
 	<br>

@@ -32,21 +32,19 @@
 		</div>
 		<br>
 		<div id="filter_options" style="visibility:visible">
-			<label>View Data:</label>
-			<select onchange="filter(0, this);">
+			<label id="select_primary_label">View Data:</label>
+			<select id="select_primary">
 				<option value="crime">Crime</option>
 				<option value="testimonials">Testimonials</option>
 			</select>
-			<label>Time of Day: </label>
-			<select onchange="filter(1, this)">
-				<option value="morning">Morning</option>
-				<option value="afternoon">Afternoon</option>
-				<option value="night">Night</option>
+			<label id="select_secondary_label">Crime Type: </label>
+			<select id="select_secondary">
+				<option value="all">All</option>
+				<option value="assault">Assault</option>
+				<option value="theft">Theft</option>
+				<option value="petty-theft">Petty Theft</option>
+				<option value="motor-theft">Motor Vehicle Theft</option>
 			</select>
-			<div id="filter-btns" style="float:right">
-				<button id="set-filters">Set filters</button>
-				<button id="reset-filters">Reset filters</button>
-			</div>
 		</div>
 	</div>
 	<br>

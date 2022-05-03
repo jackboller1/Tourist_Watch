@@ -2,18 +2,92 @@ import * as map from "./modules/map.js";
 import * as api from "./modules/api.js";
 import * as util from "./modules/util.js"
 
+/*
+Murder
+
+Sexual Assualt -> Assault
+Aggravated Assualt -> Assault
+
+Robbery -> Theft
+Burglary -> Theft
+
+Theft -> Petty Theft
+
+Motor Vehicle Theft
+*/
+
+/*
+
+*/
+
+var data_type = "crimes";
+
+/*
+if data type is crimes:
+    modifiers just contains crime type
+else:
+    modifiers[0] -> testimonial category
+    modifiers[1] -> min rating
+*/
+var modifiers = [];
+
+var all_data;
+
 document.getElementById("map_body").onload = () => { map.initialize_map(); }
 document.getElementById("search_btn").onclick = () => {
     let query = document.getElementById("search_entry").value;
     processPlaceQuery(query);
 }
 
+document.getElementById("select_primary").onchange = () => {
+    let val = document.getElementById("select_primary").value;
+    filter(0, val);
+}
+
+document.getElementById("select_secondary").onchange = () => {
+    let val = document.getElementById("select_secondary").value;
+    filter(1, val);
+}
+
 const processPlaceQuery = async (place) => {
     let req = {
         "address" : place
     };
-    let pts = await api.getData(req);
-    let pts_float = [];
+    all_data = await api.getData(req);
+    let filtered_data = {
+        "crime" : [],
+        "testimonials" : []
+    }
+    if(data_type === "crime"){
+        for(let i = 0; i < all_data["crime"].length; i++){
+            if(modifiers.length > 0){
+                if(all_data["crime"][i]["type"] === modifiers[0]){
+                    filtered_data["crimes"].push(all_data["crime"][i]);
+                }
+            }
+        }
+    } else {
+        for(let i = 0; i < all_data["testimonials"].length; i++){
+            let select = true;
+            if(modifiers.length > 0){
+                if(all_data["testimonials"][i]["category"] !== modifiers[0]){
+                    select = false;
+                }
+            }
+            if(modifiers.length > 1){
+                if(all_data["testimonials"][i]["num_upvotes"] < modifiers[1]){
+                    select = false;
+                }
+            }
+            if(select){
+                filtered_data["testimonials"].push(all_data["testimonials"][i]);
+            }
+        }
+    }
+    /*
+    TODO: Change below so map handles what type of marker to put, etc. based on stuff in filtered_data
+    So, map will accept filtered_data
+    */
     for(let i = 0; i < pts.length; i++){
         pts_float.push({
             "lat" : parseFloat(pts[i].latitude),
@@ -32,5 +106,23 @@ const processPlaceQuery = async (place) => {
             type = 0;
         }
         map.add_map_point(pts_float[i]["lat"], pts_float[i]["long"], type);
+    }
+}
+
+const add_option = (id, val, inner) => {
+    let add = `<option value=${val}>${inner}</option>\n`
+    document.getElementById(id).innerHTML += add;
+}
+
+const filter = (id, val) => {
+    if(id == 0){
+        if(val === "crime"){
+            document.getElementById("select_secondary_label").innerHTML = "Crime Type: ";
+            document.getElementById("select_secondary")
+        } else {
+
+        }
+    } else {
+
     }
 }

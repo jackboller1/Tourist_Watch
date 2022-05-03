@@ -1,5 +1,3 @@
-/* OSM & OL example code provided by https://mediarealm.com.au/ */
-
 var map;
 var mapLat = 42.2328;
 var mapLng = -88.0457;
@@ -20,10 +18,14 @@ const MARKER_TYPES = [
   {
     "url": "https://upload.wikimedia.org/wikipedia/en/f/fb/Yellow_icon.svg",
     "scale" : [0.06, 0.06]
+  },
+  {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Location_dot_orange.svg",
+    "scale" : [0.15, 0.15]
   }
 ]
 
-export function initialize_map() {
+export const initialize_map = () => {
   map = new ol.Map({
     target: "map",
     layers: [
@@ -59,12 +61,16 @@ export function initialize_map() {
   
 }
 
-export function reset_center(lat, lng, zoom_factor){
-  console.log(zoom_factor);
-  //console.log("resetting center... " + lat + " " + lng);
+const clearLayers = () => {
   for(let i = 0; i < layers.length; i++){
     map.removeLayer(layers[i]);
   }
+}
+
+export const reset_center = (lat, lng, zoom_factor) => {
+  console.log(zoom_factor);
+  //console.log("resetting center... " + lat + " " + lng);
+  clearLayers();
   layers.length = 0;
   map.getView().animate(
     {
@@ -78,7 +84,7 @@ export function reset_center(lat, lng, zoom_factor){
   )
 }
 
-export function add_map_point(lat, lng, marker_type) {
+export const add_map_point = (lat, lng, marker_type) => {
   let img = new ol.style.Icon({
     anchor: [0.5, 0.5],
     anchorXUnits: "fraction",

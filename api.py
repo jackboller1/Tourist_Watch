@@ -1,8 +1,11 @@
 import os
 import requests
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, url_for, redirect, session
 from crime_grouping import crime_standardization, crime_type_fields, assoc_list1, assoc_list2, assoc_list3
 from city_info import url_group, date_field_group, location_field_group
+from db_setup import testimonials_db, users_db
+from db_operations import insert_testimonial
+
 
 APP_TOKEN = os.environ.get("SOCRATA_APP_TOKEN")
 POSITION_STACK_KEY = os.environ.get("POSITION_STACK_APIKEY")
@@ -14,6 +17,16 @@ crime_standardization(crime_group, "Austin", assoc_list2)
 crime_standardization(crime_group, "New York", assoc_list3)
 crime_standardization(crime_group, "Kansas City", assoc_list2)
 
+#function to return the city, lat, long coordinates given the address
+def address_to_location(address):
+    #get the response from position stack api
+    url_geocode = f"http://api.positionstack.com/v1/forward?access_key={POSITION_STACK_KEY}&query={address}"
+    response_geocode = requests.get(url_geocode).json()
+    lat = response_geocode["data"][0]["latitude"]
+    long = response_geocode["data"][0]["longitude"]
+    city = response_geocode["data"][0]["locality"]
+    return (city, lat, long)
+
 api = Blueprint('api', __name__)
 
 @api.route("/city", methods=['GET', 'POST'])
@@ -23,11 +36,7 @@ def display_crime_data():
     address = request_data.get("address")
 
     #get the response from position stack api
-    url_geocode = f"http://api.positionstack.com/v1/forward?access_key={POSITION_STACK_KEY}&query={address}"
-    response_geocode = requests.get(url_geocode).json()
-    lat = response_geocode["data"][0]["latitude"]
-    long = response_geocode["data"][0]["longitude"]
-    city = response_geocode["data"][0]["locality"]
+    city, lat, long = address_to_location(address)
 
     #get the filtered set of crimes from socrata api
     city_url = url_group[city]
@@ -52,3 +61,121 @@ def display_crime_data():
                 incidents_list.append(incident_dict)
 
     return jsonify(incidents_list)
+
+@api.route("/create-testimonial", methods=['POST'])
+def create_testimonial():
+    #do not allow the user to create a testimonial if they are not logged in
+    if "user_name" not in session:
+        return jsonify({
+            "status" : False,
+            "message" : "User must be logged in to create a testimonial."
+        })
+    
+    request_data = request.get_json() #get the json data sent
+    address = request_data.get("address")
+    category = request_data.get("category")
+    text = request_data.get("text")
+
+    #get city, lat, long from address
+    city, lat, long = address_to_location(address)
+    #get the session username
+    user_name = session.get("user_name")
+    num_upvotes = 0
+    testimony = {
+        "city" : city,
+        "latitude" : lat,
+        "longitude" : long,
+        "category" : category,
+        "text" : text,
+        "username" : user_name,
+        "num_upvotes" : num_upvotes
+    }
+
+    insert_testimonial(testimonials_db, testimony)
+    
+    return jsonify({
+        "status" : True,
+        "message" : "Testimonial successfully created."
+    })
+
+
+@api.route("/login", methods=['POST'])
+def login():
+    from app import bcrypt
+    #get username and password
+    request_data = request.get_json()
+    user_name = request_data.get("user_name")
+    password = request_data.get("password")
+
+    #check if username exists
+    user_match = users_db.find_one({"user_name" : user_name})
+
+    if not user_match:
+        return jsonify({
+            "status" : False,
+            "message" : "User name does not exist. Please create an account."
+        })
+
+    #incorrect password
+    if not bcrypt.check_password_hash(user_match["password"], password):
+        return jsonify({
+            "status" : False,
+            "message" : "Incorrect password"
+        })
+
+    #update session username
+    session["user_name"] = user_name
+
+    return jsonify({
+        "status" : True,
+        "message" : "Successfully logged in"
+    })
+
+    
+
+@api.route("/sign-up", methods=['POST'])
+def sign_up():
+    from app import bcrypt
+    #get username and password
+    request_data = request.get_json()
+    user_name = request_data.get("user_name")
+    password = request_data.get("password")
+    hashed_password = bcrypt.generate_password_hash(password)
+    #check if username exists
+    user_match = users_db.find_one({"user_name" : user_name})
+
+    #username already exists
+    if user_match:
+        return jsonify({
+            "status" : False,
+            "message" : "User name already exists"
+        })
+
+    session["user_name"] = user_name
+    #insert the username and passwords into the users db
+    user_document = {
+        "user_name" : user_name,
+        "password" : hashed_password
+    }
+    insert_result = users_db.insert_one(user_document)
+    
+    _id = str(insert_result.inserted_id)
+    return jsonify({
+        "id" : _id,
+        "user_name" : user_name
+    })
+
+
+@api.route("/logout", methods=["POST"])
+def logout():
+    #remove the user_name from the session if it exists
+    session.pop("user_name", None)
+    return jsonify({
+        "status" : True,
+        "message" : "Successfully logged out."
+    })
+
+
+    
+
+     

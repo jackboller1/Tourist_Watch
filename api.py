@@ -5,6 +5,8 @@ from crime_grouping import crime_standardization, crime_type_fields, assoc_list1
 from city_info import url_group, date_field_group, location_field_group
 from db_setup import testimonials_db, users_db
 from db_operations import insert_testimonial
+#from app import bcrypt
+
 
 APP_TOKEN = os.environ.get("SOCRATA_APP_TOKEN")
 POSITION_STACK_KEY = os.environ.get("POSITION_STACK_APIKEY")
@@ -71,8 +73,7 @@ def create_testimonial():
     #get city, lat, long from address
     city, lat, long = address_to_location(address)
     #get the session username
-    #username = session.get("USERNAME")
-    username = ".."
+    user_name = session.get("user_name")
     num_upvotes = 0
     testimony = {
         "city" : city,
@@ -80,7 +81,7 @@ def create_testimonial():
         "longitude" : long,
         "category" : category,
         "text" : text,
-        "username" : username,
+        "username" : user_name,
         "num_upvotes" : num_upvotes
     }
 
@@ -89,13 +90,48 @@ def create_testimonial():
     return redirect(url_for('testimonial'))
 
 
-@api.route("/sign-up", methods=['POST'])
-def sign_up():
+@api.route("/login", methods=['POST'])
+def login():
+    from app import bcrypt
     #get username and password
     request_data = request.get_json()
     user_name = request_data.get("user_name")
     password = request_data.get("password")
 
+    #check if username exists
+    user_match = users_db.find_one({"user_name" : user_name})
+
+    if not user_match:
+        return jsonify({
+            "status" : False,
+            "message" : "User name does not exist. Please create an account."
+        })
+
+    #incorrect password
+    if not bcrypt.check_password_hash(user_match["password"], password):
+        return jsonify({
+            "status" : False,
+            "message" : "Incorrect password"
+        })
+
+    #update session username
+    session["user_name"] = user_name
+
+    return jsonify({
+        "status" : True,
+        "message" : "Successfully logged in"
+    })
+
+    
+
+@api.route("/sign-up", methods=['POST'])
+def sign_up():
+    from app import bcrypt
+    #get username and password
+    request_data = request.get_json()
+    user_name = request_data.get("user_name")
+    password = request_data.get("password")
+    hashed_password = bcrypt.generate_password_hash(password)
     #check if username exists
     user_match = users_db.find_one({"user_name" : user_name})
 
@@ -110,7 +146,7 @@ def sign_up():
     #insert the username and passwords into the users db
     user_document = {
         "user_name" : user_name,
-        "password" : password
+        "password" : hashed_password
     }
     insert_result = users_db.insert_one(user_document)
     
@@ -119,6 +155,15 @@ def sign_up():
         "id" : _id,
         "user_name" : user_name
     })
+
+
+@api.route("/logout", methods=["POST"])
+def logout():
+    session.pop("user_id")
+
+@api.route("/foo", methods=['GET'])
+def foo():
+    return session.sid
 
     
 

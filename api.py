@@ -5,7 +5,6 @@ from crime_grouping import crime_standardization, crime_type_fields, assoc_list1
 from city_info import url_group, date_field_group, location_field_group
 from db_setup import testimonials_db, users_db
 from db_operations import insert_testimonial
-#from app import bcrypt
 
 
 APP_TOKEN = os.environ.get("SOCRATA_APP_TOKEN")
@@ -63,8 +62,15 @@ def display_crime_data():
 
     return jsonify(incidents_list)
 
-@api.route("/create-testimonial", methods=['GET', 'POST'])
+@api.route("/create-testimonial", methods=['POST'])
 def create_testimonial():
+    #do not allow the user to create a testimonial if they are not logged in
+    if "user_name" not in session:
+        return jsonify({
+            "status" : False,
+            "message" : "User must be logged in to create a testimonial."
+        })
+    
     request_data = request.get_json() #get the json data sent
     address = request_data.get("address")
     category = request_data.get("category")
@@ -87,7 +93,10 @@ def create_testimonial():
 
     insert_testimonial(testimonials_db, testimony)
     
-    return redirect(url_for('testimonial'))
+    return jsonify({
+        "status" : True,
+        "message" : "Testimonial successfully created."
+    })
 
 
 @api.route("/login", methods=['POST'])
@@ -166,9 +175,6 @@ def logout():
         "message" : "Successfully logged out."
     })
 
-@api.route("/foo", methods=['GET'])
-def foo():
-    return session.sid
 
     
 

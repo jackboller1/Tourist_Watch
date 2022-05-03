@@ -159,7 +159,12 @@ def sign_up():
 
 @api.route("/logout", methods=["POST"])
 def logout():
-    session.pop("user_id")
+    #remove the user_name from the session if it exists
+    session.pop("user_name", None)
+    return jsonify({
+        "status" : True,
+        "message" : "Successfully logged out."
+    })
 
 @api.route("/foo", methods=['GET'])
 def foo():

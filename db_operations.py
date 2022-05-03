@@ -4,7 +4,7 @@ from db_setup import db, testimonials_db
 #proposed db schema
 {
     "_id" : "auto generated",
-    "username" : "string",
+    "user_name" : "string",
     "password" : "hashed string",
     #"my_testimonials" : "list of testimonial ids (optional)"
 }

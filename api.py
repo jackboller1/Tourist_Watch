@@ -1,9 +1,9 @@
 import os
 import requests
-from flask import Blueprint, request, jsonify, url_for, redirect
+from flask import Blueprint, request, jsonify, url_for, redirect, session
 from crime_grouping import crime_standardization, crime_type_fields, assoc_list1, assoc_list2, assoc_list3
 from city_info import url_group, date_field_group, location_field_group
-from db_setup import testimonials_db
+from db_setup import testimonials_db, users_db
 from db_operations import insert_testimonial
 
 APP_TOKEN = os.environ.get("SOCRATA_APP_TOKEN")
@@ -87,4 +87,39 @@ def create_testimonial():
     insert_testimonial(testimonials_db, testimony)
     
     return redirect(url_for('testimonial'))
+
+
+@api.route("/sign-up", methods=['POST'])
+def sign_up():
+    #get username and password
+    request_data = request.get_json()
+    user_name = request_data.get("user_name")
+    password = request_data.get("password")
+
+    #check if username exists
+    user_match = users_db.find_one({"user_name" : user_name})
+
+    #username already exists
+    if user_match:
+        return jsonify({
+            "status" : False,
+            "message" : "User name already exists"
+        })
+
+    session["user_name"] = user_name
+    #insert the username and passwords into the users db
+    user_document = {
+        "user_name" : user_name,
+        "password" : password
+    }
+    insert_result = users_db.insert_one(user_document)
+    
+    _id = str(insert_result.inserted_id)
+    return jsonify({
+        "id" : _id,
+        "user_name" : user_name
+    })
+
+    
+
      

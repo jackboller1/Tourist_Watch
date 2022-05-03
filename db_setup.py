@@ -17,6 +17,7 @@ def get_database():
 
 db = get_database()
 testimonials_db = db.testimonials
+users_db = db.users
 
 
 

@@ -25,3 +25,4 @@ from db_setup import db, testimonials_db
 def insert_testimonial(test_collection, testimonial):
     '''Insert user's testimonial into the testimonial collection'''
     test_collection.insert_one(testimonial)
+

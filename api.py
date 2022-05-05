@@ -239,6 +239,8 @@ def login():
 @api.route("/sign-up", methods=['POST'])
 def sign_up():
     from app import bcrypt
+    #if user is logged in to another account, log them out
+    session.pop("user_name", None)
     #get username and password
     request_data = request.get_json()
     user_name = request_data.get("user_name")

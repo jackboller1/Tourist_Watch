@@ -48,9 +48,7 @@ def display_crime_data():
     #create list of crimes that fall into specific categories
     incidents_list = []
     for report in response_crime:
-        #print(report)
         #only send crimes that fall in one of the 7 categories being tracked
-        #print(crime_type_fields[city])
         if crime_type_fields[city] in report: #the response from socrata api has the correct field
             crime_type = report[crime_type_fields[city]] #crime type sent from socrata api
             if crime_type in crime_group[city]: #the crime type is one of the few that we want to track
@@ -60,7 +58,37 @@ def display_crime_data():
                 incident_dict["crime_type"] = crime_group[city][crime_type]
                 incidents_list.append(incident_dict)
 
-    return jsonify(incidents_list)
+    #create list of testimonials for the city
+    user_name = None
+    if "user_name" in session:
+        user_name = session["user_name"]
+    
+    testimonials_list = []
+    #get all testimonials from the city being searched
+    cursor = testimonials_db.find({"city" : city})
+    for testimonial in cursor:
+        #check if the testimonial has been reviewed by the user
+        testimonial_id = testimonial.get("_id")
+        #default value if testimonial was not reviewed
+        user_num_stars = -1
+        if user_name:
+            command_cursor = users_db.aggregate([
+                {"$unwind" : "$reviews"},
+                {"$match" : { "user_name" : user_name, "reviews.testimonial_id" : testimonial_id }},
+                {"$project" : { "num_stars":  "$reviews.num_stars", "_id" : 0}}
+            ])
+            #store how many stars the user gave the testimonial
+            for document in command_cursor:
+                user_num_stars = document["num_stars"]
+            
+        testimonial["user_num_stars"] = user_num_stars
+        testimonial["_id"] = str(testimonial_id)
+        testimonials_list.append(testimonial)
+      
+    city_list = [incidents_list, testimonials_list]
+    return jsonify(city_list)
+
+
 
 @api.route("/rate-testimonial", methods=['POST'])
 def rate_testimonial():

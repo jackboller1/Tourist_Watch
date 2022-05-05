@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, jsonify
+from flask import Flask, render_template, session, redirect, url_for
 from flask_cors import CORS
 import os
 from flask_session import Session
@@ -31,10 +31,7 @@ def register():
 @app.route("/submit-testimonial", methods=['GET'])
 def testimonial():
     if "user_name" not in session:
-        return jsonify({
-            "status" : False,
-            "message" : "User must be logged in to create a testimonial."
-        })
+        return redirect(url_for('home'))
     
     return render_template("testimonial.html")
 

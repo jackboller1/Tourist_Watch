@@ -103,7 +103,6 @@ def rate_testimonial():
     request_data = request.get_json()
     testimonial_id = request_data.get("testimonial_id")
     num_stars = int(request_data.get("num_stars"))
-    prev_stars = int(request_data.get("prev_stars"))
 
     user_name = session["user_name"]
     user_review = users_db.find_one({
@@ -139,6 +138,15 @@ def rate_testimonial():
         })
 
     #user already made a review for this testimonial
+    #find the prev number of stars the user gave the review
+    command_cursor = users_db.aggregate([
+                {"$unwind" : "$reviews"},
+                {"$match" : { "user_name" : user_name, "reviews.testimonial_id" : ObjectId(testimonial_id) }},
+                {"$project" : { "num_stars":  "$reviews.num_stars", "_id" : 0}}
+            ])
+    #store how many stars the user gave the testimonial
+    for document in command_cursor:
+        prev_stars = document["num_stars"]
     #update the new number of stars in user reviews
     users_db.update_one({
         "$and" : [

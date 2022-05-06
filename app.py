@@ -1,12 +1,19 @@
 from flask import Flask, render_template, session, redirect, url_for
 from flask_cors import CORS
-import os
+import os, glob
 from flask_session import Session
 from flask_bcrypt import Bcrypt
 
 from api import api
 from pymongo import MongoClient
 
+if not os.path.isdir('flask_session'):
+    os.mkdir("flask_session")
+
+dir = 'flask_session/'
+filelist = glob.glob(os.path.join(dir, "*"))
+for f in filelist:
+    os.remove(f)
 
 app = Flask(__name__, template_folder="templates")
 
@@ -30,6 +37,7 @@ def register():
 
 @app.route("/submit-testimonial", methods=['GET'])
 def testimonial():
+    print(session)
     if "user_name" not in session:
         return redirect(url_for('home'))
     

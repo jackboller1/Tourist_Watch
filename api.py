@@ -289,6 +289,14 @@ def logout():
     })
 
 
-    
-
+@api.route("/receive-testimonial", methods=["POST"])
+def id_to_testimonial():
+    #recieve the testimonial id sent
+    request_data = request.get_json()
+    testimonial_id = request_data.get("testimonial_id")
+    #return the testimonail associated with this id
+    testimonial_match = testimonials_db.find_one({"_id" : ObjectId(testimonial_id)})
+    #update the _id to be a string
+    testimonial_match["_id"] = testimonial_id
+    return jsonify(testimonial_match)
      

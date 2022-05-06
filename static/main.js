@@ -117,12 +117,29 @@ const add_option = (id, val, inner) => {
 const filter = (id, val) => {
     if(id == 0){
         if(val === "crime"){
+            data_type = "crimes";
             document.getElementById("select_secondary_label").innerHTML = "Crime Type: ";
-            document.getElementById("select_secondary")
+            document.getElementById("select_secondary").innerHTML = "";
+            add_option("select_secondary", "all", "All");
+            add_option("select_secondary", "assualt", "Assualt");
+            add_option("select_secondary", "theft", "Theft");
+            add_option("select_secondary", "petty-theft", "Petty Theft");
+            add_option("select_secondary", "motor-theft", "Motor Vehicle Theft");
+        } else {
+            data_type = "testimonials";
+            document.getElementById("select_secondary_label").innerHTML = "Min Rating: ";
+            document.getElementById("select_secondary").innerHTML = "";
+            add_option("select_secondary", "1", "1");
+            add_option("select_secondary", "2", "2");
+            add_option("select_secondary", "3", "3");
+            add_option("select_secondary", "4", "4");
+            add_option("select_secondary", "5", "5");
+        }
+    } else {
+        if(data_type === "crime"){
+            
         } else {
 
         }
-    } else {
-
     }
 }

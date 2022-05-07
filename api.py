@@ -15,29 +15,26 @@ crime_group = {}
 crime_standardization(crime_group, "Chicago", assoc_list1)
 crime_standardization(crime_group, "Austin", assoc_list2)
 crime_standardization(crime_group, "New York", assoc_list3)
-crime_standardization(crime_group, "Kansas City", assoc_list2)
 
 #function to return the city, lat, long coordinates given the address
 def address_to_location(address):
     #get the response from position stack api
     url_geocode = f"http://api.positionstack.com/v1/forward?access_key={POSITION_STACK_KEY}&query={address}"
     response_geocode = requests.get(url_geocode).json()
+    
+    if len(response_geocode["data"]) == 0: #no response from position stack
+        return (None, None, None)
+
     lat = response_geocode["data"][0]["latitude"]
     long = response_geocode["data"][0]["longitude"]
     city = response_geocode["data"][0]["locality"]
     return (city, lat, long)
 
-api = Blueprint('api', __name__)
 
-@api.route("/city", methods=['POST'])
-def display_crime_data():
-    #get the address sent
-    request_data = request.get_json() #get the json data sent
-    address = request_data.get("address")
-
-    #get the response from position stack api
-    city, lat, long = address_to_location(address)
+def place_to_crime_list(city, lat, long):
     #get the filtered set of crimes from socrata api
+    if city not in url_group:
+        return []
     city_url = url_group[city]
     date_field = date_field_group[city]
     location_field = location_field_group[city]
@@ -56,6 +53,24 @@ def display_crime_data():
                 incident_dict["longitude"] = report["longitude"]
                 incident_dict["crime_type"] = crime_group[city][crime_type]
                 incidents_list.append(incident_dict)
+    
+    return incidents_list
+
+api = Blueprint('api', __name__)
+
+@api.route("/city", methods=['POST'])
+def display_crime_data():
+    #get the address sent
+    request_data = request.get_json() #get the json data sent
+    address = request_data.get("address")
+
+    #get the response from position stack api
+    city, lat, long = address_to_location(address)
+    
+    if city is None:
+        incidents_list = []
+    else:
+        incidents_list = place_to_crime_list(city, lat, long)
 
     #create list of testimonials for the city
     user_name = None

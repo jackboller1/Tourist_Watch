@@ -24,3 +24,13 @@ export function getDev(pts, x, y){
     let res = Math.sqrt(res_x + res_y);
     return res;
 }
+
+export const reduce = (category) => {
+    if(category.includes("assault")){
+        return "assault";
+    }
+    if((category === "robbery") || (category === "burglary") || (category === "motor vehicle theft")){
+        return "theft";
+    }
+    return "petty_theft";
+}

@@ -15,29 +15,26 @@ crime_group = {}
 crime_standardization(crime_group, "Chicago", assoc_list1)
 crime_standardization(crime_group, "Austin", assoc_list2)
 crime_standardization(crime_group, "New York", assoc_list3)
-crime_standardization(crime_group, "Kansas City", assoc_list2)
 
 #function to return the city, lat, long coordinates given the address
 def address_to_location(address):
     #get the response from position stack api
     url_geocode = f"http://api.positionstack.com/v1/forward?access_key={POSITION_STACK_KEY}&query={address}"
     response_geocode = requests.get(url_geocode).json()
+    
+    if len(response_geocode["data"]) == 0: #no response from position stack
+        return (None, None, None)
+
     lat = response_geocode["data"][0]["latitude"]
     long = response_geocode["data"][0]["longitude"]
     city = response_geocode["data"][0]["locality"]
     return (city, lat, long)
 
-api = Blueprint('api', __name__)
 
-@api.route("/city", methods=['POST'])
-def display_crime_data():
-    #get the address sent
-    request_data = request.get_json() #get the json data sent
-    address = request_data.get("address")
-
-    #get the response from position stack api
-    city, lat, long = address_to_location(address)
+def place_to_crime_list(city, lat, long):
     #get the filtered set of crimes from socrata api
+    if city not in url_group:
+        return []
     city_url = url_group[city]
     date_field = date_field_group[city]
     location_field = location_field_group[city]
@@ -56,6 +53,24 @@ def display_crime_data():
                 incident_dict["longitude"] = report["longitude"]
                 incident_dict["crime_type"] = crime_group[city][crime_type]
                 incidents_list.append(incident_dict)
+    
+    return incidents_list
+
+api = Blueprint('api', __name__)
+
+@api.route("/city", methods=['POST'])
+def display_crime_data():
+    #get the address sent
+    request_data = request.get_json() #get the json data sent
+    address = request_data.get("address")
+
+    #get the response from position stack api
+    city, lat, long = address_to_location(address)
+    
+    if city is None:
+        incidents_list = []
+    else:
+        incidents_list = place_to_crime_list(city, lat, long)
 
     #create list of testimonials for the city
     user_name = None
@@ -102,7 +117,6 @@ def rate_testimonial():
     request_data = request.get_json()
     testimonial_id = request_data.get("testimonial_id")
     num_stars = int(request_data.get("num_stars"))
-    prev_stars = int(request_data.get("prev_stars"))
 
     user_name = session["user_name"]
     user_review = users_db.find_one({
@@ -138,6 +152,15 @@ def rate_testimonial():
         })
 
     #user already made a review for this testimonial
+    #find the prev number of stars the user gave the review
+    command_cursor = users_db.aggregate([
+                {"$unwind" : "$reviews"},
+                {"$match" : { "user_name" : user_name, "reviews.testimonial_id" : ObjectId(testimonial_id) }},
+                {"$project" : { "num_stars":  "$reviews.num_stars", "_id" : 0}}
+            ])
+    #store how many stars the user gave the testimonial
+    for document in command_cursor:
+        prev_stars = document["num_stars"]
     #update the new number of stars in user reviews
     users_db.update_one({
         "$and" : [
@@ -280,6 +303,14 @@ def logout():
     })
 
 
-    
-
+@api.route("/receive-testimonial", methods=["POST"])
+def id_to_testimonial():
+    #recieve the testimonial id sent
+    request_data = request.get_json()
+    testimonial_id = request_data.get("testimonial_id")
+    #return the testimonail associated with this id
+    testimonial_match = testimonials_db.find_one({"_id" : ObjectId(testimonial_id)})
+    #update the _id to be a string
+    testimonial_match["_id"] = testimonial_id
+    return jsonify(testimonial_match)
      

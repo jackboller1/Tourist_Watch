@@ -37,7 +37,6 @@ def display_crime_data():
 
     #get the response from position stack api
     city, lat, long = address_to_location(address)
-
     #get the filtered set of crimes from socrata api
     city_url = url_group[city]
     date_field = date_field_group[city]

@@ -2,23 +2,6 @@ import * as map from "./modules/map.js";
 import * as api from "./modules/api.js";
 import * as util from "./modules/util.js"
 
-/*
-Murder
-
-Sexual Assault -> Assault
-Aggravated Assault -> Assault
-
-Robbery -> Theft
-Burglary -> Theft
-
-Theft -> Petty Theft
-
-Motor Vehicle Theft
-*/
-
-/*
-
-*/
 
 var data_type = "crimes";
 

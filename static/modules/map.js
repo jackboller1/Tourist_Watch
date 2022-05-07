@@ -1,5 +1,6 @@
 import * as util from "./util.js"
 
+
 var map;
 var mapLat = 42.2328;
 var mapLng = -88.0457;
@@ -9,11 +10,26 @@ var layers = []
 var curr_data = null;
 
 const ZOOM_SCALE = 1;
+const DOMAIN = "localhost:5000";
+
+const container = document.getElementById('popup');
+const content = document.getElementById('popup-content');
+const closer = document.getElementById('popup-closer');
 
 const popup = new ol.Overlay({
-  element: document.getElementById('popup'),
+  element: container,
+  autoPan: {
+    animation: {
+      duration: 250,
+    },
+  },
 });
 
+closer.onclick = function () {
+  popup.setPosition(undefined);
+  closer.blur();
+  return false;
+};
 
 const MARKER_TYPES = {
   "assault": {
@@ -34,6 +50,66 @@ const MARKER_TYPES = {
   }
 }
 
+const populatePopup = (coord) => {
+  let lat = coord[1];
+  let long = coord[0];
+  if(curr_data["crime"].length > 0){
+    //crime is active
+    let res = [];
+    for(let i = 0; i < curr_data["crime"].length; i++){
+      let their_lat = curr_data["crime"][i].latitude;
+      let their_long = curr_data["crime"][i].longitude;
+      if(typeof(their_lat) === "string"){
+        their_lat = parseFloat(their_lat);
+        their_long = parseFloat(their_long);
+      }
+      if(util.dist(lat, long, their_lat, their_long) < 1e-7){
+        //console.log(util.dist(lat, long, their_lat, their_long));
+        res.push(curr_data["crime"][i]);
+      }
+    }
+    content.innerHTML = "";
+    content.innerHTML += `<h3 style="color:lightgray">Found ${res.length} crime(s) at this point:</h3><br>`;
+    for(let i = 0; i < res.length; i++){
+      let typ = util.reduce(res[i]["crime_type"]);
+      let show = util.upperWords(res[i]["crime_type"]);
+      let col = "red";
+      if(typ === "theft"){
+        col = "orange";
+        //show = "Theft";
+      } else if (typ === "petty_theft"){
+        col = "yellow";
+        //show = "Petty Theft";
+      }
+      content.innerHTML += `<font color="${col}">${show}</font><br>`;
+    }
+  } else {
+    //testimonial is active
+    let res = [];
+    for(let i = 0; i < curr_data["testimonials"].length; i++){
+      let their_lat = curr_data["testimonials"][i].latitude;
+      let their_long = curr_data["testimonials"][i].longitude;
+      if(typeof(their_lat) === "string"){
+        their_lat = parseFloat(their_lat);
+        their_long = parseFloat(their_long);
+      }
+      if(util.dist(lat, long, their_lat, their_long) < 5e-6){
+        //console.log(util.dist(lat, long, their_lat, their_long));
+        res.push(curr_data["testimonials"][i]);
+      }
+    }
+    content.innerHTML = "";
+    content.innerHTML += `<h3 style="color:lightgray">Found ${res.length} testimonials(s) at this point:</h3><br>`;
+    for(let i = 0; i < res.length; i++){
+      let tot_stars = res[i]["total_stars"];
+      let num_reviews = res[i]["num_reviews"];
+      let rating = tot_stars / num_reviews;
+      let id = res[i]._id;
+      content.innerHTML += `<font color="lightgray">Avg. Rating: ${rating}</font><br><font color="lightgray">View testimonial: <a href="${DOMAIN}/testimonial/${id}">Click Here</a></font><br><br>`;
+    }
+  }
+}
+
 export const initialize_map = () => {
   map = new ol.Map({
     target: "map",
@@ -51,21 +127,12 @@ export const initialize_map = () => {
   });
   map.addOverlay(popup);
 
-  map.on("click", (evt) => {
-    const element = popup.getElement();
+  map.on("singleclick", (evt) => {
     const coordinate = evt.coordinate;
     const hdms = ol.coordinate.toStringHDMS(ol.proj.toLonLat(coordinate));
   
-    $(element).popover('dispose');
+    populatePopup(ol.proj.toLonLat(coordinate));
     popup.setPosition(coordinate);
-    $(element).popover({
-      container: element,
-      placement: 'top',
-      animation: false,
-      html: true,
-      content: "<button id='popupButton'>Click me</button>"
-    });
-    $(element).popover('show');
   });
   
 }
@@ -79,9 +146,12 @@ const clearLayers = () => {
 
 
 export const populate = (data) => {
+  popup.setPosition(undefined);
+  closer.blur();
+
   clearLayers();
   curr_data = data;
-  
+
   let all_pts = []
   //all crime points
   for(let i = 0; i < data["crime"].length; i++){
@@ -111,6 +181,9 @@ export const populate = (data) => {
     });
     console.log("adding");
     add_map_point(lat, long, "neutral");
+  }
+  if(all_pts.length == 0){
+    return;
   }
   let ctr = util.getCenter(all_pts);
   let dev = util.getDev(all_pts, ctr["avg-lat"], ctr["avg-long"]);

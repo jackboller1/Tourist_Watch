@@ -47,5 +47,9 @@ def testimonial():
     
     return render_template("testimonial.html")
 
+@app.route("/testimonial/<testimonial_id>", methods=['GET'])
+def get_testimonial():
+    return render_template("view_testimonial.html")
+
 
 

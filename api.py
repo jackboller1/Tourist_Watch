@@ -289,6 +289,7 @@ def sign_up():
     
     #_id = str(insert_result.inserted_id)
     return jsonify({
+        "status" : True,
         "user_name" : user_name
     })
 

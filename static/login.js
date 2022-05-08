@@ -1,6 +1,6 @@
 import * as api from "./modules/api.js"
 
-const LOCAL = true;
+const LOCAL = false;
 const HOSTNAME = (LOCAL ? "http://localhost:5000" : "https://polar-coast-49800.herokuapp.com/");
 
 document.getElementById("back_btn").onclick = () => {

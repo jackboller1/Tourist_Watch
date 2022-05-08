@@ -1,4 +1,4 @@
-const LOCAL = true;
+const LOCAL = false;
 const HOSTNAME = (LOCAL ? "http://localhost:5000" : "https://polar-coast-49800.herokuapp.com/");
 
 export const login = async (username, pass) => {

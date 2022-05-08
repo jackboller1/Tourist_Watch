@@ -1,5 +1,6 @@
-const LOCAL = false;
-const HOSTNAME = (LOCAL ? "http://localhost:5000" : "https://polar-coast-49800.herokuapp.com/");
+import * as util from "./util.js"
+
+const HOSTNAME = (util.LOCAL ? "http://localhost:5000" : "https://polar-coast-49800.herokuapp.com/");
 
 export const login = async (username, pass) => {
     let response = await fetch(`${HOSTNAME}/login`, {

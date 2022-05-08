@@ -1,7 +1,7 @@
 import * as api from "./modules/api.js"
+import * as util from "./modules/util.js"
 
-const LOCAL = true;
-const HOSTNAME = (LOCAL ? "http://localhost:5000" : "https://polar-coast-49800.herokuapp.com/");
+const HOSTNAME = (util.LOCAL ? "http://localhost:5000" : "https://polar-coast-49800.herokuapp.com/");
 
 document.getElementById("back_btn").onclick = () => {
     window.location.href = HOSTNAME;

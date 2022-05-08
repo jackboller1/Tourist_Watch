@@ -1,6 +1,5 @@
 import * as util from "./util.js"
 
-
 var map;
 var mapLat = 42.2328;
 var mapLng = -88.0457;
@@ -11,8 +10,7 @@ var curr_data = null;
 
 const ZOOM_SCALE = 1;
 
-const LOCAL = false;
-const HOSTNAME = (LOCAL ? "http://localhost:5000" : "https://polar-coast-49800.herokuapp.com/");
+const HOSTNAME = (util.LOCAL ? "http://localhost:5000" : "https://polar-coast-49800.herokuapp.com/");
 
 const container = document.getElementById('popup');
 const content = document.getElementById('popup-content');

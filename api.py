@@ -196,7 +196,6 @@ def create_testimonial():
     
     request_data = request.get_json() #get the json data sent
     address = request_data.get("address")
-    category = request_data.get("category")
     text = request_data.get("text")
 
     #get city, lat, long from address
@@ -209,7 +208,6 @@ def create_testimonial():
         "city" : city,
         "latitude" : lat,
         "longitude" : long,
-        "category" : category,
         "text" : text,
         "username" : user_name,
         "num_reviews" : num_reviews,

@@ -10,7 +10,9 @@ var layers = []
 var curr_data = null;
 
 const ZOOM_SCALE = 1;
-const DOMAIN = "localhost:5000";
+
+const LOCAL = true;
+const HOSTNAME = (LOCAL ? "http://localhost:5000" : "https://polar-coast-49800.herokuapp.com/");
 
 const container = document.getElementById('popup');
 const content = document.getElementById('popup-content');
@@ -105,7 +107,7 @@ const populatePopup = (coord) => {
       let num_reviews = res[i]["num_reviews"];
       let rating = tot_stars / num_reviews;
       let id = res[i]._id;
-      content.innerHTML += `<font color="lightgray">Avg. Rating: ${rating}</font><br><font color="lightgray">View testimonial: <a href="${DOMAIN}/testimonial/${id}">Click Here</a></font><br><br>`;
+      content.innerHTML += `<font color="lightgray">Avg. Rating: ${rating}</font><br><font color="lightgray">View testimonial: <a href="${HOSTNAME}/testimonial/${id}">Click Here</a></font><br><br>`;
     }
   }
 }

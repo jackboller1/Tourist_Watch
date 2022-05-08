@@ -1,5 +1,33 @@
 const HOSTNAME = "https://polar-coast-49800.herokuapp.com";
 
+export const login = async (username, pass) => {
+    let response = await fetch(`${HOSTNAME}/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify({
+            'user_name' : username,
+            'password' : pass
+        })
+    });
+    return await response.json();
+}
+
+export const register = async (username, pass) => {
+    let response = await fetch(`${HOSTNAME}/sign-up`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify({
+            'user_name' : username,
+            'password' : pass
+        })
+    });
+    return await response.json();
+}
+
 export const getData = async (place) => {
     let response = await fetch(`${HOSTNAME}/city`, {
         method: 'POST',

@@ -8,8 +8,8 @@ document.getElementById("back_btn").onclick = () => {
 }
 
 document.getElementById("login_btn").onclick = async () => {
-    let user_in = document.getElementById("username_in").innerHTML;
-    let password_in = document.getElementById("password_in").innerHTML;
+    let user_in = document.getElementById("username_in").value;
+    let password_in = document.getElementById("password_in").value;
 
     let res = await api.login(user_in, password_in);
     if(res["status"] == false){

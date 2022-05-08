@@ -35,6 +35,12 @@ def home():
 def login():
     return render_template("login.html")
 
+@app.route("/logout", methods=["GET"])
+def logout():
+    #remove the user_name from the session if it exists
+    session.pop("user_name", None)
+    return render_template("index.html")
+
 @app.route("/register", methods=['GET'])
 def register():
     return render_template("register.html")
@@ -48,7 +54,7 @@ def testimonial():
     return render_template("testimonial.html")
 
 @app.route("/testimonial/<testimonial_id>", methods=['GET'])
-def get_testimonial():
+def get_testimonial(testimonial_id):
     return render_template("view_testimonial.html")
 
 

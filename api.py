@@ -226,6 +226,7 @@ def create_testimonial():
 
 @api.route("/login", methods=['POST'])
 def login():
+    print('passed')
     from app import bcrypt
     #get username and password
     request_data = request.get_json()
@@ -234,7 +235,7 @@ def login():
 
     #check if username exists
     user_match = users_db.find_one({"user_name" : user_name})
-
+    
     if not user_match:
         return jsonify({
             "status" : False,
@@ -250,6 +251,7 @@ def login():
 
     #update session username
     session["user_name"] = user_name
+    print(session)
 
     return jsonify({
         "status" : True,
@@ -291,16 +293,6 @@ def sign_up():
     return jsonify({
         "status" : True,
         "user_name" : user_name
-    })
-
-
-@api.route("/logout", methods=["POST"])
-def logout():
-    #remove the user_name from the session if it exists
-    session.pop("user_name", None)
-    return jsonify({
-        "status" : True,
-        "message" : "Successfully logged out."
     })
 
 

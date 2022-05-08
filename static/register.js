@@ -8,11 +8,11 @@ document.getElementById("back_btn").onclick = () => {
 }
 
 document.getElementById("login_btn").onclick = async () => {
-    let user_in = document.getElementById("username_in").innerHTML;
-    let password_in = document.getElementById("password_in").innerHTML;
-    let confirm_pass = document.getElementById("confirm_pass").innerHTML;
+    let user_in = document.getElementById("username_in").value;
+    let password_in = document.getElementById("password_in").value;
+    let confirm_pass = document.getElementById("confirm_pass").value;
 
-    if(password_in !== confirm_pass){
+    if(password_in != confirm_pass){
         alert("Passwords do not match!");
         return;
     }

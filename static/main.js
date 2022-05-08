@@ -32,15 +32,21 @@ document.getElementById("select_secondary").onchange = () => {
     filter(1, val);
 }
 
-document.getElementById("submit-testimonial").style.visibility = "hidden";
+document.getElementById("logout").onclick = () => {
+    window.localStorage.clear();
+}
+
+document.getElementById("submit-testimonial").style.display = "none";
+document.getElementById("logout").style.display = "none";
 
 if(window.localStorage.getItem("login") != null && window.localStorage.getItem("login")){
-    document.getElementById("greeting").style.visibility = "visible";
-    document.getElementById("greeting").innerHTML = `Hi, ${window.localStorage.getItem("uname")}`;
-    document.getElementById("submit-testimonial").style.visibility = "visible";
-    
-    document.getElementById("login").style.visibility = "hidden";
-    document.getElementById("register").style.visibility = "hidden";
+    document.getElementById("greeting").style.display = "initial";
+    document.getElementById("greeting").innerHTML = `Hi, ${window.localStorage.getItem("uname")}     `;
+    document.getElementById("submit-testimonial").style.display = "initial";
+    document.getElementById("logout").style.display = "initial";
+
+    document.getElementById("login").style.display = "none";
+    document.getElementById("register").style.display = "none";
 }
 
 const applyFilters = () => {

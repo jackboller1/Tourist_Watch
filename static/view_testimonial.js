@@ -15,7 +15,7 @@ var description = testimonial["text"];
 
 var tot_stars = testimonial["total_stars"];
 var tot_raters = testimonial["num_reviews"];
-var avg = ((tot_raters == 0) ? "N/A" : (tot_stars / tot_raters));
+var avg = ((tot_raters == 0) ? "N/A" : (tot_stars / tot_raters).toPrecision(2));
 
 if((username === window.localStorage.getItem("uname")) || (window.localStorage.getItem("uname") == null)){
     document.getElementById("rating_selection").style.visibility = "hidden";

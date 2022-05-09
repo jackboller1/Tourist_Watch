@@ -103,12 +103,9 @@ const populatePopup = (coord) => {
     for(let i = 0; i < res.length; i++){
       let tot_stars = res[i]["total_stars"];
       let num_reviews = res[i]["num_reviews"];
-      let rating = tot_stars / num_reviews;
-      if(typeof(rating) != "number"){
-        rating = "N/A";
-      }
+      let rating = ((num_reviews) == 0 ? "N/A" : (tot_stars / num_reviews).toPrecision(2));
       let id = res[i]._id;
-      content.innerHTML += `<font color="lightgray">Avg. Rating: ${rating}, # of reviews: ${num_reviews}</font><br><font color="lightgray">View testimonial: <a target="_blank" href="${HOSTNAME}/testimonial/${id}">Click Here</a></font><br><br>`;
+      content.innerHTML += `<font color="lightgray">Avg. Rating: ${rating}</font><br><font color="lightgray"># of reviews: ${num_reviews}</font><br><font color="lightgray">View testimonial: <a target="_blank" href="${HOSTNAME}/testimonial/${id}">Click Here</a></font><br><br>`;
     }
   }
 }

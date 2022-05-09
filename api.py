@@ -196,7 +196,6 @@ def create_testimonial():
     
     request_data = request.get_json() #get the json data sent
     address = request_data.get("address")
-    category = request_data.get("category")
     text = request_data.get("text")
 
     #get city, lat, long from address
@@ -209,7 +208,6 @@ def create_testimonial():
         "city" : city,
         "latitude" : lat,
         "longitude" : long,
-        "category" : category,
         "text" : text,
         "username" : user_name,
         "num_reviews" : num_reviews,
@@ -305,5 +303,31 @@ def id_to_testimonial():
     testimonial_match = testimonials_db.find_one({"_id" : ObjectId(testimonial_id)})
     #update the _id to be a string
     testimonial_match["_id"] = testimonial_id
+
+    user_num_stars = -1
+    #return the user's review, if any
+    if "user_name" in session:
+        user_name = session["user_name"]
+        user_review = users_db.find_one({
+            "$and" : [
+                {"user_name" : user_name}, 
+                {"reviews.testimonial_id" : ObjectId(testimonial_id)}
+            ]
+        })
+
+        if user_review:
+            #user already made a review for this testimonial
+            #find the number of stars the user gave the review
+            command_cursor = users_db.aggregate([
+                {"$unwind" : "$reviews"},
+                {"$match" : { "user_name" : user_name, "reviews.testimonial_id" : ObjectId(testimonial_id) }},
+                {"$project" : { "num_stars":  "$reviews.num_stars", "_id" : 0}}
+            ])
+            #store how many stars the user gave the testimonial
+            for document in command_cursor:
+                user_num_stars = document["num_stars"]
+
+    testimonial_match["user_num_stars"] = user_num_stars
+
     return jsonify(testimonial_match)
      

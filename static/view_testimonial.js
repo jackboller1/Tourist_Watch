@@ -43,6 +43,8 @@ document.getElementById("submit_rating").onclick = async () => {
         alert("Please select a rating [1-5]");
         return;
     }
-    await api.sendRating(TESTIMONIAL_ID, curr_rating);
-    console.log("sent rating");
+    let res = await api.sendRating(TESTIMONIAL_ID, curr_rating);
+    if(res["status"]){
+        alert("Your rating has been recorded");
+    }
 }

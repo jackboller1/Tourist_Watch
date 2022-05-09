@@ -1,6 +1,6 @@
 import * as util from "./util.js"
 
-const HOSTNAME = (util.LOCAL ? "http://localhost:5000" : "https://touristwatch.herokuapp.com/");
+const HOSTNAME = (util.LOCAL ? "http://localhost:5000" : "https://touristwatch.herokuapp.com");
 
 export const login = async (username, pass) => {
     let response = await fetch(`${HOSTNAME}/login`, {
@@ -40,6 +40,33 @@ export const makeTestimonial = async (place, desc) => {
             'address' : place,
             'category' : "",
             'text' : desc
+        })
+    });
+    return await response.json();
+}
+
+export const getTestimonial = async (id) => {
+    let response = await fetch(`${HOSTNAME}/receive-testimonial`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify({
+            'testimonial_id' : id
+        })
+    });
+    return await response.json();
+}
+
+export const sendRating = async (id, stars) => {
+    let response = await fetch(`${HOSTNAME}/rate-testimonial`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify({
+            'testimonial_id' : id,
+            'num_stars' : stars
         })
     });
     return await response.json();

@@ -78,7 +78,13 @@ const applyFilters = () => {
                 let num_raters = all_data[1][i]["num_reviews"];
                 let avg_stars = num_stars / num_raters;
                 let thresh = parseInt(modifiers[0]);
-                if(avg_stars >= thresh){
+                let show = false;
+                if(num_raters == 0){
+                    show = (thresh == 1);
+                } else {
+                    show = (avg_stars >= thresh);
+                }
+                if(show){
                     filtered_data["testimonials"].push(all_data[1][i]);
                 }
             } else {

@@ -10,7 +10,7 @@ var curr_data = null;
 
 const ZOOM_SCALE = 1;
 
-const HOSTNAME = (util.LOCAL ? "http://localhost:5000" : "https://touristwatch.herokuapp.com/");
+const HOSTNAME = (util.LOCAL ? "http://localhost:5000" : "https://touristwatch.herokuapp.com");
 
 const container = document.getElementById('popup');
 const content = document.getElementById('popup-content');

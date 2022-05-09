@@ -1,4 +1,4 @@
-export const LOCAL = false;
+export const LOCAL = true;
 
 export const getCenter = (pts) => {
     let n = pts.length;

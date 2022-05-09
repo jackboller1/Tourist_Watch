@@ -30,6 +30,21 @@ export const register = async (username, pass) => {
     return await response.json();
 }
 
+export const makeTestimonial = async (place, desc) => {
+    let response = await fetch(`${HOSTNAME}/create-testimonial`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify({
+            'address' : place,
+            'category' : "",
+            'text' : desc
+        })
+    });
+    return await response.json();
+}
+
 export const getData = async (place) => {
     let response = await fetch(`${HOSTNAME}/city`, {
         method: 'POST',
